@@ -39,13 +39,17 @@ from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
 twitter_data=[]
+remove=['at_user','url']
 
 for tweet in twitter_data_raw:
-    review=re.sub('[^a-zA-Z]','  ',tweet)
+    review=re.sub('((www\.[^\s]+)|(https?://[^\s]+))','url',tweet)
+    review=re.sub('@[^\s]+','at_user',review)
+    review=re.sub(r'#([\^s]+)', r'\1', review)
+    review=re.sub('[^a-zA-Z]','  ',review)
     review=review.lower()
     review=review.split()
     ps=PorterStemmer()
-    review=[ps.stem(word) for word in review if word not in set(stopwords.words('english'))]
+    review=[ps.stem(word) for word in review if word not in set(stopwords.words('english')) and word not in remove]
     review=' '.join(review)
     twitter_data.append(review)
 
@@ -66,8 +70,6 @@ pos=result.count('positive')
 neg=result.count('negative')
 neu=result.count('neutral')
 
-"""
-for i in range(100):
+for i in range(43):
     if result[i]=='negative':
         print(i)
-"""
